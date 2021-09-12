@@ -1,0 +1,68 @@
+---
+- name: Create a simple vm
+  hosts: localhost
+  gather_facts: False
+  
+  collections:
+    - ovirt.ovirt
+  vars_files:
+    - credentials.yaml
+    - vm_variables.yaml
+  tasks:
+
+    - name: authenticate with ovirt
+      ovirt_auth:
+        url: "{{ ovirt_url }}"
+        username: "{{ ovirt_username }}"
+        password: "{{ ovirt_pwd }}"
+    
+    - name: copy images on ovirt
+      loop: "{{ images }}"
+      ovirt_disk:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ item.name }}"
+        storage_domain: IsoDomain
+        content_type: iso
+        wait: true
+        format: raw
+        upload_image_path: "{{ item.path }}"
+
+
+    - name: creation of storage
+      loop: "{{ vms }}"
+      ovirt_disk:
+          auth: "{{ ovirt_auth }}"
+          name: "{{ item.name }}-ansible-disk"
+          size: "{{ item.disk_size }}"
+          state: present
+          storage_domain: StorageExample
+
+    - name: creation of a tiny vm
+      loop: "{{ vms }}"
+      ovirt_vm:
+        auth: "{{ ovirt_auth }}"
+        name:  "{{ item.name }}-ansible"
+        cluster: Default
+        state: running
+        cd_iso: "{{ item.iso }}"
+        memory: "{{ item.memory }}"
+        cpu_cores: 1
+        boot_devices:
+          - cdrom
+        nics:
+          - profile_name: ovirtmgmt
+            name: "{{ item.nic }}"
+    
+    - name: creation of a tag on vm
+      loop: "{{ vms }}"
+      ovirt_tag:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ item.tag }}"
+        vms:
+          - "{{ item.name }}-ansible"
+
+    - name: delete token auth
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+

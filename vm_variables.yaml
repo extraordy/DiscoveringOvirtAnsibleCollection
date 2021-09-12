@@ -1,0 +1,25 @@
+vms:
+  - name: tiny
+    tag: test
+    disk_size: 1GiB
+    memory: 1GiB
+    iso: Tiny.iso
+    n_cores: 1
+    nic: nic1
+                                                       
+  - name: fedora
+    tag: prod
+    disk_size: 30GiB
+    memory: 2GiB
+    iso: Fedora.iso
+    n_cores: 2
+    nic: nic2
+                                                       
+images:
+  - name: Fedora.iso
+    size: 2.6GiB
+    path: ./Fedora-Silverblue-ostree-x86_64-34-1.2.iso
+                                                       
+  - name: Tiny.iso
+    size: 1.8MiB
+    path: ./512-byte-vm.iso
