@@ -1,0 +1,11 @@
+plugin: ovirt.ovirt.ovirt
+ovirt_url: https://engine.ovirt/ovirt-engine/api
+ovirt_username: admin@internal
+ovirt_password: admin
+keyed_groups:
+  - key: cluster
+    prefix: 'cluster'
+groups:
+  test: "'test' in tags"
+  prod: "'prod' in tags"
+
